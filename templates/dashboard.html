@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Secure Cloud Storage - Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- Header -->
+
+    <div class="top">
+
+        <div>
+            <h1>🔐 Secure Cloud Storage</h1>
+
+            <p>
+                Welcome,
+                <strong>{{ session["username"] }}</strong>
+            </p>
+        </div>
+
+        <a href="{{ url_for('logout') }}">
+            Logout
+        </a>
+
+    </div>
+
+
+    <!-- Messages -->
+
+    {% with messages = get_flashed_messages() %}
+
+        {% for message in messages %}
+
+            <p class="message">
+                {{ message }}
+            </p>
+
+        {% endfor %}
+
+    {% endwith %}
+
+
+    <!-- Upload -->
+
+    <h2>📤 Upload File</h2>
+
+    <p>
+        Your file will be encrypted before it is stored.
+    </p>
+
+    <form
+        action="{{ url_for('upload') }}"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <input
+            type="file"
+            name="file"
+            required
+        >
+
+        <button type="submit">
+            Upload & Encrypt
+        </button>
+
+    </form>
+
+
+    <!-- My Files -->
+
+    <h2>📁 My Files</h2>
+
+    {% if files %}
+
+        {% for file in files %}
+
+            <div class="file-card">
+
+                <strong>
+                    {{ file["original_name"] }}
+                </strong>
+
+                <br><br>
+
+                <a
+                    href="{{ url_for(
+                        'download',
+                        file_id=file['id']
+                    ) }}"
+                >
+                    ⬇️ Download
+                </a>
+
+
+                <form
+                    action="{{ url_for(
+                        'share',
+                        file_id=file['id']
+                    ) }}"
+                    method="POST"
+                >
+
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Enter username to share with"
+                        required
+                    >
+
+                    <button type="submit">
+                        🔗 Share
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            You haven't uploaded any files yet.
+        </p>
+
+    {% endif %}
+
+
+    <!-- Shared Files -->
+
+    <h2>📨 Files Shared With Me</h2>
+
+    {% if shared_files %}
+
+        {% for file in shared_files %}
+
+            <div class="file-card">
+
+                <strong>
+                    {{ file["original_name"] }}
+                </strong>
+
+                <p>
+                    Shared by:
+                    <strong>{{ file["owner"] }}</strong>
+                </p>
+
+                <a
+                    href="{{ url_for(
+                        'download',
+                        file_id=file['id']
+                    ) }}"
+                >
+                    ⬇️ Download
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No files have been shared with you.
+        </p>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>
